@@ -14,6 +14,7 @@ const GroupSchema = new mongoose.Schema(
     password: {
         type: String,
         required: true,
+        select: false,
     },
     imageUrl: {
       type: String,
@@ -46,6 +47,11 @@ const GroupSchema = new mongoose.Schema(
   },
   {
     timestamps: true, // createdAt과 updatedAt 필드가 자동으로 관리됩니다.
+    toJSON: {
+      transform: function(doc, ret) {
+          delete ret.password;  // 응답할 때 password 필드를 제거
+      }
+  }
   }
 );
 

@@ -4,7 +4,8 @@ export const createGroup = async (req, res) => {
     try {
         const group = new Group(req.body);
         const savedGroup = await group.save();
-        res.status(201).json(savedGroup);
+
+        res.status(201).json(savedGroup.toJSON());
     }
     catch (error) {
         if(error.name == 'ValidationError') {
@@ -46,10 +47,20 @@ export const getGroup = async (req, res) => {
             .find({name: regex, isPublic: isPublic})
             .sort(sortOption)
             .skip(skip)
-            .limit(pageSize);
+            .limit(pageSize)
+            .lean();
+        
+        //delete badge attr from responseJSON
+        foundGroup.forEach(group => {
+            //add badgeCount attr to each group
+            group.badgeCount = group.badges.length;
+            delete group.badges;
+        });
+
         res.status(200).json(foundGroup);
     }
     catch(error) {
         res.status(409).json({ message: error.message });
     }
 };
+
