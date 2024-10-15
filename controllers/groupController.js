@@ -1,23 +1,23 @@
 import Group from '../models/Group.js';
 
-export const createGroup = async (req, res) => {
+export const createGroup = async (req, res, next) => {
     try {
         const group = new Group(req.body);
         const savedGroup = await group.save();
+        const responseJSON = savedGroup.toJSON();
+        delete responseJSON.badgeCount;
 
-        res.status(201).json(savedGroup.toJSON());
+        res.status(201).json(responseJSON);
     }
     catch (error) {
         if(error.name == 'ValidationError') {
-            res.status(404).json({ message: '잘못된 요청입니다' });
-            return;
-        } else {
-            res.status(409).json({ message: '서버 오류가 발생했습니다' });
+            error.statusCode = 400;
         }
+        next(error);
     }
 };
 
-export const getGroup = async (req, res) => {
+export const getGroup = async (req, res, next) => {
     try {
         let { page = 1,
                 pageSize = 10,
@@ -35,7 +35,7 @@ export const getGroup = async (req, res) => {
             latest: {createdAt: 'desc'},
             mostPosted: {postCount: 'desc'},
             mostLiked: {likeCount: 'desc'},
-            mostBadge: {badges: 'desc'},
+            mostBadge: {badgeCount: 'desc'}
         };
 
         const sortOption = actions[sortBy];
@@ -47,20 +47,19 @@ export const getGroup = async (req, res) => {
             .find({name: regex, isPublic: isPublic})
             .sort(sortOption)
             .skip(skip)
-            .limit(pageSize)
-            .lean();
-        
-        //delete badge attr from responseJSON
-        foundGroup.forEach(group => {
-            //add badgeCount attr to each group
-            group.badgeCount = group.badges.length;
-            delete group.badges;
+            .limit(pageSize);
+
+        const responseJSON = foundGroup.map(group => {
+            const groupJSON = group.toJSON();
+            delete groupJSON.badges;
+            return groupJSON;
         });
 
-        res.status(200).json(foundGroup);
+        res.status(200).json(responseJSON);
     }
     catch(error) {
-        res.status(409).json({ message: error.message });
+        error.statusCode = 400;
+        next(error);
     }
 };
 

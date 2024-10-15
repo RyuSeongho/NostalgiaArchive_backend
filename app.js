@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import * as dotenv from 'dotenv';
 import groupRoutes from './routes/groupRoutes.js';
 import cors from 'cors'
+import { errorHandler } from './middlewares/errorHandler.js';
 
 dotenv.config();
 
@@ -17,7 +18,10 @@ app.get('/hello', (req, res) => {
   res.send('Hello World!');
 });
 
+app.use(errorHandler);
+
 mongoose.connect(process.env.DATABASE_URL).then(() => console.log('Connected to MongoDB'));
+
 
 app.listen(process.env.PORT || 3000, () => {
   console.log('Server is running on port 3000');

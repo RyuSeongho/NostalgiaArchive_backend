@@ -18,6 +18,7 @@ const GroupSchema = new mongoose.Schema(
     },
     imageUrl: {
       type: String,
+      required: true,
     },
     isPublic: {
       type: Boolean,
@@ -36,10 +37,6 @@ const GroupSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
     introduction: {
       type: String,
       required: true,
@@ -48,12 +45,20 @@ const GroupSchema = new mongoose.Schema(
   {
     timestamps: true, // createdAt과 updatedAt 필드가 자동으로 관리됩니다.
     toJSON: {
+      virtuals: true,
       transform: function(doc, ret) {
           delete ret.password;  // 응답할 때 password 필드를 제거
+          delete ret.updatedAt;
+          delete ret._id;
+          delete ret.__v;
       }
-  }
+    },
   }
 );
+
+GroupSchema.virtual('badgeCount').get(function() {
+  return this.badges.length;
+});
 
 GroupSchema.pre('save', async function () {
   const doc = this;
