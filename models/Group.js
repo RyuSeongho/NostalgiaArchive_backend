@@ -14,7 +14,6 @@ const GroupSchema = new mongoose.Schema(
     password: {
         type: String,
         required: true,
-        select: false,
     },
     imageUrl: {
       type: String,
