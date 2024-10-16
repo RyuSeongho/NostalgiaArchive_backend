@@ -1,5 +1,7 @@
 import Post from '../models/Post.js';
 import Group from '../models/Group.js';
+import Comment from '../models/Comment.js';
+import { response } from 'express';
 
 export const updatePost = async (req, res, next) => {
     try {
@@ -186,6 +188,102 @@ export const isPostPublic = async (req, res, next) => {
         if(error.name == 'ValidationError') {
             error.statusCode = 400;
         }
+        next(error);
+    }
+}
+
+export const createPostComment = async (req, res, next) => {
+    try {
+        const { postId } = req.params;
+        const { nickname, content, password } = req.body;
+
+        const selectedPost = await Post
+            .findOne({id: postId});
+
+        if (!selectedPost) {
+            const error = new Error();
+            error.statusCode = 404;
+            throw error;
+        }
+
+        if(!nickname || !content || !password) {
+            const error = new Error();
+            error.statusCode = 400;
+            throw error;
+        }
+
+        const newComment = new Comment(req.body);
+        newComment.postGenuineId = selectedPost._id;
+
+        const savedComment = await newComment.save();
+
+        const responseJSON = savedComment.toJSON();
+
+        res.status(201).json(responseJSON);
+    }
+    catch(error) {
+        if(error.name == 'ValidationError') {
+            error.statusCode = 400;
+        }
+        next(error);
+    }
+}
+
+export const getPostComment = async (req, res, next) => {
+    try {
+        let { page = 1,
+                pageSize = 10,
+            } = req.query;
+
+        // 유효성 검증
+        page = isNaN(page) || page <= 0 ? 1 : Number(page);
+        pageSize = isNaN(pageSize) || pageSize <= 0 ? 10 : Number(pageSize);
+        const postId = req.params.postId;
+
+        if(!postId) {
+            const error = new Error();
+            error.statusCode = 400;
+            throw error;
+        }
+
+        //find there is a group with the given id
+        const foundPost = await Post
+            .findOne({id: postId});
+        
+        if (!foundPost) {
+            const error = new Error();
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const skip = (page - 1) * pageSize;
+
+        const qurey = {postGenuineId: foundPost._id};
+
+        const foundComment = await Comment
+            .find(qurey)
+            .skip(skip)
+            .limit(pageSize);
+
+        const totalItemCount = await Comment.countDocuments(qurey);
+
+
+        const dataArray = foundComment.map(group => {
+            const postJSON = group.toJSON();
+            return postJSON;
+        });
+
+        const responseJSON = {};
+
+        responseJSON.currentPage = page;
+        responseJSON.totalPages = Math.ceil(totalItemCount / pageSize);
+        responseJSON.totalItemCount = totalItemCount;
+        responseJSON.data = dataArray;
+
+        res.status(200).json(responseJSON);
+    }
+    catch(error) {
+        error.statusCode = 400;
         next(error);
     }
 }

@@ -11,5 +11,7 @@ postRouter.get('/:postId', postController.getPostDetail);
 postRouter.post('/:postId/verify-password', postController.verifyPostPassword);
 postRouter.post('/:postId/like', postController.likePost);
 postRouter.get('/:postId/is-public', postController.isPostPublic);
+postRouter.post('/:postId/comments', postController.createPostComment);
+postRouter.get('/:postId/comments', postController.getPostComment);
 
 export default postRouter;
