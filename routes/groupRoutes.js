@@ -1,17 +1,20 @@
 import express from 'express';
 
+
 import * as groupController from '../controllers/groupController.js';
 
-const router = express.Router();
+const groupRouter = express.Router();
 
 // Group CRUD routes
-router.post('/', groupController.createGroup);
-router.get('/', groupController.getGroup);
-router.patch('/:groupId', groupController.updateGroup);
-router.delete('/:groupId', groupController.deleteGroup);
-router.get('/:groupId', groupController.getGroupDetail);
-router.post('/:groupId/verify-password', groupController.verifyGroupPassword);
-router.post('/:groupId/like', groupController.likeGroup);
-router.get('/:groupId/members', groupController.isGroupPublic);   
+groupRouter.post('/', groupController.createGroup);
+groupRouter.get('/', groupController.getGroup);
+groupRouter.patch('/:groupId', groupController.updateGroup);
+groupRouter.delete('/:groupId', groupController.deleteGroup);
+groupRouter.get('/:groupId', groupController.getGroupDetail);
+groupRouter.post('/:groupId/verify-password', groupController.verifyGroupPassword);
+groupRouter.post('/:groupId/like', groupController.likeGroup);
+groupRouter.get('/:groupId/members', groupController.isGroupPublic);
+groupRouter.post('/:groupId/posts', groupController.createGroupPost);
+groupRouter.get('/:groupId/posts', groupController.getGroupPost);
 
-export default router;
+export default groupRouter;

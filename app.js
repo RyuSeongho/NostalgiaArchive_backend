@@ -14,8 +14,14 @@ app.use(express.json());
 
 app.use('/api/groups', groupRoutes);
 
-app.get('/hello', (req, res) => {
-  res.send('Hello World!');
+app.get('/ping', (req, res) => {
+  res.send('Pong!');
+});
+
+app.use((req, res, next) => {
+  const error = new Error();
+  error.statusCode = 404;
+  next(error);
 });
 
 app.use(errorHandler);
