@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import * as dotenv from 'dotenv';
 import groupRoutes from './routes/groupRoutes.js';
+import postRoutes from './routes/postRoutes.js';
 import cors from 'cors'
 import { errorHandler } from './middlewares/errorHandler.js';
 
@@ -13,6 +14,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/groups', groupRoutes);
+app.use('/api/posts', postRoutes);
 
 app.get('/ping', (req, res) => {
   res.send('Pong!');

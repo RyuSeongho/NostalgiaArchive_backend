@@ -91,7 +91,7 @@ export const updateGroup = async (req, res, next) => {
             throw error;
         }
 
-        console.log(selectedGroup, selectedGroup.password, password);
+        
         
         if (selectedGroup.password != password) {
             const error = new Error();
@@ -289,8 +289,6 @@ export const createGroupPost = async (req, res, next) => {
         const responseJSON = savedPost.toJSON();
         
         responseJSON.groupId = groupId;
-
-        console.log(responseJSON);
 
         res.status(201).json(responseJSON);
     }
