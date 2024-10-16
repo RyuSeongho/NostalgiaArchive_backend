@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import * as dotenv from 'dotenv';
 import groupRoutes from './routes/groupRoutes.js';
 import postRoutes from './routes/postRoutes.js';
+import commentRoutes from './routes/commentRoutes.js';
 import cors from 'cors'
 import { errorHandler } from './middlewares/errorHandler.js';
 
@@ -15,6 +16,7 @@ app.use(express.json());
 
 app.use('/api/groups', groupRoutes);
 app.use('/api/posts', postRoutes);
+app.use('/api/comments', commentRoutes);
 
 app.get('/ping', (req, res) => {
   res.send('Pong!');
